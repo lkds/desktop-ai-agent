@@ -1,10 +1,10 @@
 {
   "productName": "Desktop AI Agent",
   "version": "0.1.0",
-  "identifier": "com.desktop-agent.app",
+  "identifier": "com.desktop-agent.agentapp",
   "build": {
-    "beforeBuildCommand": "cd src-ui && npm run build",
-    "beforeDevCommand": "cd src-ui && npm run dev",
+    "beforeBuildCommand": "cd ../src-ui && npm run build",
+    "beforeDevCommand": "cd ../src-ui && npm run dev",
     "frontendDist": "../src-ui/dist",
     "devUrl": "http://localhost:1420"
   },
