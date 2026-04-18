@@ -3,7 +3,7 @@
 //! Tauri 应用入口
 //! 集成 Rust Agent 后端
 
-use tauri::State;
+use tauri::{State, Manager};
 use std::sync::Arc;
 use tokio::sync::Mutex;
 use std::path::PathBuf;
@@ -107,7 +107,7 @@ async fn list_skills(state: State<'_, AppState>) -> Result<Vec<Skill>, String> {
 async fn install_skill(
     source_path: String,
     state: State<'_, AppState>,
-) -> Result<(), String> {
+) -> Result<String, String> {
     let mut manager = state.skills_manager.lock().await;
     let path = PathBuf::from(source_path);
     manager.install_skill(&path).await.map_err(|e| e.to_string())
