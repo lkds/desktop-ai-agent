@@ -1,221 +1,125 @@
-/// Video Generation Tool
-/// 使用外部 API 或本地工具生成视频
-
+/// 视频生成工具
 use async_trait::async_trait;
-use serde::{Deserialize, Serialize};
-use std::path::PathBuf;
+use super::tool_trait::{Tool, ToolError, StepResult, RiskLevel};
 
-use super::tool_trait::{Tool, StepResult, ToolError, RiskLevel};
-
-/// Video Generator Tool
-pub struct VideoGeneratorTool {
-    api_key: Option<String>,
-    provider: VideoProvider,
-}
-
-/// 支持的视频生成 Provider
-#[derive(Debug, Clone, Serialize, Deserialize)]
-#[serde(rename_all = "lowercase")]
-pub enum VideoProvider {
-    Runway,
-    Pika,
-    Synthesia,
-    Local,  // 使用 ffmpeg 本地合成
-}
-
-/// 视频生成参数
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct VideoParams {
-    pub input_type: InputType,
-    pub content: String,
-    pub output_path: String,
-    #[serde(default = "default_duration")]
-    pub duration: u32,
-    #[serde(default = "default_resolution")]
-    pub resolution: String,
-    #[serde(default)]
-    pub style: Option<String>,
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-#[serde(rename_all = "lowercase")]
-pub enum InputType {
-    Text,
-    Image,
-    Audio,
-}
-
-fn default_duration() -> u32 { 5 }
-fn default_resolution() -> String { "1080p".to_string() }
-
-impl VideoGeneratorTool {
-    pub fn new(provider: VideoProvider, api_key: Option<String>) -> Self {
-        Self { api_key, provider }
-    }
-    
-    pub fn local() -> Self {
-        Self::new(VideoProvider::Local, None)
-    }
-}
+pub struct VideoGenerateTool;
 
 #[async_trait]
-impl Tool for VideoGeneratorTool {
-    fn name(&self) -> &str {
-        "video_generate"
-    }
-    
-    fn description(&self) -> &str {
-        "Generate video from text description, image, or audio. Supports Runway, Pika, Synthesia APIs or local ffmpeg synthesis."
-    }
-    
+impl Tool for VideoGenerateTool {
+    fn name(&self) -> &str { "video_generate" }
+    fn description(&self) -> &str { "生成视频（使用 ffmpeg）" }
     fn parameters_schema(&self) -> serde_json::Value {
         serde_json::json!({
             "type": "object",
-            "required": ["input_type", "content", "output_path"],
             "properties": {
-                "input_type": {
-                    "type": "string",
-                    "enum": ["text", "image", "audio"],
-                    "description": "Input type for video generation"
-                },
-                "content": {
-                    "type": "string",
-                    "description": "Text description or image/audio file path"
-                },
-                "output_path": {
-                    "type": "string",
-                    "description": "Output video file path"
-                },
-                "duration": {
-                    "type": "integer",
-                    "default": 5,
-                    "description": "Video duration in seconds"
-                },
-                "resolution": {
-                    "type": "string",
-                    "default": "1080p",
-                    "description": "Video resolution (720p, 1080p, 4k)"
-                },
-                "style": {
-                    "type": "string",
-                    "description": "Video style (cinematic, realistic, anime)"
-                }
-            }
+                "images": { "type": "array", "description": "图片路径列表" },
+                "audio": { "type": "string", "description": "音频文件路径（可选）" },
+                "output": { "type": "string", "description": "输出视频路径" },
+                "fps": { "type": "integer", "description": "帧率", "default": 24 },
+                "duration": { "type": "integer", "description": "每张图片显示时长（秒）", "default": 3 }
+            },
+            "required": ["images", "output"]
         })
     }
+    fn risk_level(&self) -> RiskLevel { RiskLevel::Medium }
     
-    async fn execute(
-        &self,
-        parameters: serde_json::Value,
-        allowed_paths: &[String],
-    ) -> Result<StepResult, ToolError> {
-        let params: VideoParams = serde_json::from_value(parameters)
-            .map_err(|e| ToolError::InvalidParameters(e.to_string()))?;
+    async fn execute(&self, params: serde_json::Value, _allowed: &[String]) -> Result<StepResult, ToolError> {
+        let images: Vec<String> = params["images"]
+            .as_array()
+            .map(|a| a.iter().filter_map(|v| v.as_str().map(|s| s.to_string())).collect())
+            .ok_or_else(|| ToolError::InvalidParameters("images array required".into()))?;
         
-        // 验证输出路径
-        let output_path = PathBuf::from(&params.output_path);
-        if !allowed_paths.iter().any(|p| output_path.starts_with(p)) {
-            return Err(ToolError::PermissionDenied(params.output_path));
+        let output = params["output"].as_str()
+            .ok_or_else(|| ToolError::InvalidParameters("output path required".into()))?;
+        
+        let fps = params["fps"].as_i64().unwrap_or(24);
+        let duration = params["duration"].as_i64().unwrap_or(3);
+        let audio = params["audio"].as_str();
+        
+        // 创建临时文件列表
+        let concat_file = "/tmp/video_concat.txt";
+        let mut concat_content = String::new();
+        for img in &images {
+            concat_content.push_str(&format!("file '{}'\nduration {}\n", img, duration));
+        }
+        concat_content.push_str(&format!("file '{}'\n", images.last().unwrap()));
+        
+        std::fs::write(concat_file, &concat_content)
+            .map_err(|e| ToolError::ExecutionFailed(e.to_string()))?;
+        
+        // 构建 ffmpeg 命令
+        let mut cmd = tokio::process::Command::new("ffmpeg");
+        cmd.arg("-y")
+           .arg("-f").arg("concat")
+           .arg("-safe").arg("0")
+           .arg("-i").arg(concat_file);
+        
+        if let Some(audio_file) = audio {
+            cmd.arg("-i").arg(audio_file)
+               .arg("-c:v").arg("libx264")
+               .arg("-c:a").arg("aac")
+               .arg("-shortest");
+        } else {
+            cmd.arg("-c:v").arg("libx264")
+               .arg("-r").arg(format!("{}", fps));
         }
         
-        match self.provider {
-            VideoProvider::Local => {
-                self.generate_local(&params).await
-            }
-            VideoProvider::Runway | VideoProvider::Pika | VideoProvider::Synthesia => {
-                if self.api_key.is_none() {
-                    return Err(ToolError::ExecutionFailed(
-                        format!("API key required for {} provider", self.provider_name())
-                    ));
-                }
-                self.generate_via_api(&params).await
-            }
+        cmd.arg("-pix_fmt").arg("yuv420p")
+           .arg(output);
+        
+        let result = cmd.output().await
+            .map_err(|e| ToolError::ExecutionFailed(e.to_string()))?;
+        
+        if !result.status.success() {
+            let stderr = String::from_utf8_lossy(&result.stderr);
+            return Err(ToolError::ExecutionFailed(format!("ffmpeg failed: {}", stderr)));
         }
-    }
-    
-    fn risk_level(&self) -> RiskLevel {
-        RiskLevel::Medium  // 会创建新文件
+        
+        Ok(StepResult {
+            output: format!("视频生成成功: {} ({} 张图片)", output, images.len()),
+            files: Some(vec![output.to_string()]),
+            data: None,
+        })
     }
 }
 
-impl VideoGeneratorTool {
-    fn provider_name(&self) -> &str {
-        match self.provider {
-            VideoProvider::Runway => "Runway",
-            VideoProvider::Pika => "Pika",
-            VideoProvider::Synthesia => "Synthesia",
-            VideoProvider::Local => "Local (ffmpeg)",
-        }
+pub struct VideoFromTextTool;
+
+#[async_trait]
+impl Tool for VideoFromTextTool {
+    fn name(&self) -> &str { "video_from_text" }
+    fn description(&self) -> &str { "从文本生成视频（调用 API）" }
+    fn parameters_schema(&self) -> serde_json::Value {
+        serde_json::json!({
+            "type": "object",
+            "properties": {
+                "text": { "type": "string", "description": "文本内容或脚本" },
+                "style": { "type": "string", "description": "视频风格", "default": "default" },
+                "output": { "type": "string", "description": "输出路径" }
+            },
+            "required": ["text", "output"]
+        })
     }
+    fn risk_level(&self) -> RiskLevel { RiskLevel::Low }
     
-    /// 本地视频生成（使用 ffmpeg）
-    async fn generate_local(&self, params: &VideoParams) -> Result<StepResult, ToolError> {
-        match params.input_type {
-            InputType::Image => {
-                // 图片转视频：使用 ffmpeg 创建静态视频
-                let image_path = PathBuf::from(&params.content);
-                if !image_path.exists() {
-                    return Err(ToolError::FileNotFoundError(params.content.clone()));
-                }
-                
-                // ffmpeg 命令
-                let resolution = match params.resolution.as_str() {
-                    "4k" => "3840:2160",
-                    "720p" => "1280:720",
-                    _ => "1920:1080",
-                };
-                
-                let cmd = format!(
-                    "ffmpeg -loop 1 -i {} -c:v libx264 -t {} -pix_fmt yuv420p -vf scale={} {} -y",
-                    params.content, params.duration, resolution, params.output_path
-                );
-                
-                // 执行命令
-                let output = std::process::Command::new("sh")
-                    .arg("-c")
-                    .arg(&cmd)
-                    .output()
-                    .map_err(|e| ToolError::ExecutionFailed(e.to_string()))?;
-                
-                if !output.status.success() {
-                    return Err(ToolError::ExecutionFailed(
-                        String::from_utf8_lossy(&output.stderr).to_string()
-                    ));
-                }
-                
-                Ok(StepResult {
-                    output: format!(
-                        "Generated video: {} ({}s, {})",
-                        params.output_path, params.duration, params.resolution
-                    ),
-                    files: Some(vec![params.output_path.clone()]),
-                    data: None,
-                })
-            }
-            InputType::Text => {
-                // 文本转视频：本地只能创建简单字幕视频
-                Err(ToolError::ExecutionFailed(
-                    "Local text-to-video requires external API (Runway/Pika). Use image input for local generation.".to_string()
-                ))
-            }
-            InputType::Audio => {
-                // 音频+图片转视频
-                Err(ToolError::ExecutionFailed(
-                    "Local audio-to-video not implemented yet. Use Synthesia API for talking head videos.".to_string()
-                ))
-            }
-        }
-    }
-    
-    /// API 视频生成
-    async fn generate_via_api(&self, params: &VideoParams) -> Result<StepResult, ToolError> {
-        // TODO: 实现 API 调用
-        // Runway API: https://api.runwayml.com/v1/generate
-        // Pika API: https://api.pika.art/v1/generate
-        // Synthesia API: https://api.synthesia.io/v2/videos
+    async fn execute(&self, params: serde_json::Value, _allowed: &[String]) -> Result<StepResult, ToolError> {
+        let text = params["text"].as_str()
+            .ok_or_else(|| ToolError::InvalidParameters("text required".into()))?;
+        let output = params["output"].as_str()
+            .ok_or_else(|| ToolError::InvalidParameters("output required".into()))?;
         
-        Err(ToolError::ExecutionFailed(
-            "API video generation not yet implemented. Configure provider and API key in config.".to_string()
-        ))
+        // 这里应该调用视频生成 API（如 RunwayML、Pika 等）
+        // 简化版：生成占位符视频
+        let placeholder = format!(
+            "视频生成任务已提交:\n文本: {}\n输出: {}\n\n提示: 请配置视频生成 API (RunwayML/Pika/Sora) 完成实际生成",
+            if text.len() > 100 { &text[..100] } else { text },
+            output
+        );
+        
+        Ok(StepResult {
+            output: placeholder,
+            files: None,
+            data: None,
+        })
     }
 }

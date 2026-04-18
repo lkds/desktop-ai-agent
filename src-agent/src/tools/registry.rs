@@ -42,15 +42,21 @@ pub struct ToolInfo {
 
 pub fn init_default_tools() -> ToolRegistry {
     let mut registry = ToolRegistry::new();
+    // 文件操作
     registry.register(Arc::new(crate::tools::fileops::FileReadTool));
     registry.register(Arc::new(crate::tools::fileops::FileWriteTool));
     registry.register(Arc::new(crate::tools::fileops::DirListTool));
     registry.register(Arc::new(crate::tools::fileops::FileMoveTool));
     registry.register(Arc::new(crate::tools::fileops::FileDeleteTool));
+    // 浏览器
     registry.register(Arc::new(crate::tools::browser::BrowserOpenTool));
     registry.register(Arc::new(crate::tools::browser::BrowserSearchTool));
+    registry.register(Arc::new(crate::tools::browser::BrowserScrapeTool));
+    // Shell
     registry.register(Arc::new(crate::tools::shell::ShellExecuteTool));
     registry.register(Arc::new(crate::tools::shell::ShellScriptTool));
-    registry.register(Arc::new(crate::tools::video::VideoGeneratorTool::local()));
+    // 视频
+    registry.register(Arc::new(crate::tools::video::VideoGenerateTool));
+    registry.register(Arc::new(crate::tools::video::VideoFromTextTool));
     registry
 }
