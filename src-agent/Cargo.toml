@@ -31,13 +31,13 @@ tracing-subscriber = "0.3"
 # Tauri integration (optional)
 tauri = { version = "2", optional = true }
 
-[features]
-default = []
-tauri = ["dep:tauri"]
-
 [lib]
 name = "qoderwork_agent"
 path = "src/lib.rs"
+
+[features]
+default = []
+tauri = ["dep:tauri"]
 
 # Binary for standalone testing
 [[bin]]
