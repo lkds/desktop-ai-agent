@@ -51,5 +51,6 @@ pub fn init_default_tools() -> ToolRegistry {
     registry.register(Arc::new(crate::tools::browser::BrowserSearchTool));
     registry.register(Arc::new(crate::tools::shell::ShellExecuteTool));
     registry.register(Arc::new(crate::tools::shell::ShellScriptTool));
+    registry.register(Arc::new(crate::tools::video::VideoGeneratorTool::local()));
     registry
 }
