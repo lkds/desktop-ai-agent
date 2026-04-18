@@ -6,7 +6,7 @@ use qoderwork_agent::{
     ProviderKind,
     ToolRegistry,
     SkillsManager,
-    providers::{OpenAIProvider, ClaudeProvider, OllamaProvider},
+    providers::{OpenAIProvider, ClaudeProvider, OllamaProvider, DashScopeProvider},
 };
 use std::path::PathBuf;
 use std::sync::Arc;
@@ -64,6 +64,10 @@ async fn main() {
         ProviderKind::Ollama => {
             Arc::new(OllamaProvider::new(config.provider.clone())
                 .expect("❌ Ollama Provider 创建失败"))
+        }
+        ProviderKind::DashScope => {
+            Arc::new(DashScopeProvider::new(config.provider.clone())
+                .expect("DashScope Provider 创建失败"))
         }
         ProviderKind::Custom => {
             Arc::new(OpenAIProvider::new(config.provider.clone())

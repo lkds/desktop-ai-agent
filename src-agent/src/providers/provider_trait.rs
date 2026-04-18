@@ -27,6 +27,7 @@ pub enum ProviderKind {
     OpenAI,
     Claude,
     Ollama,
+    DashScope,
     Custom,
 }
 
