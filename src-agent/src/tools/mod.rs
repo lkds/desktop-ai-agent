@@ -3,6 +3,7 @@ pub mod fileops;
 pub mod browser;
 pub mod shell;
 pub mod video;
+pub mod pdf;
 pub mod registry;
 
 pub use tool_trait::{Tool, ToolError, StepResult, RiskLevel};

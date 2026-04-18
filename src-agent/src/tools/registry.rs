@@ -57,6 +57,8 @@ pub fn init_default_tools() -> ToolRegistry {
     registry.register(Arc::new(crate::tools::shell::ShellScriptTool));
     // 视频
     registry.register(Arc::new(crate::tools::video::VideoGenerateTool));
-    registry.register(Arc::new(crate::tools::video::VideoFromTextTool));
+    // PDF
+    registry.register(Arc::new(crate::tools::pdf::PDFExtractTool));
+    registry.register(Arc::new(crate::tools::pdf::PDFMergeTool));
     registry
 }
