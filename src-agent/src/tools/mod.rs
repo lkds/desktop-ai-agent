@@ -4,6 +4,8 @@ pub mod browser;
 pub mod shell;
 pub mod video;
 pub mod pdf;
+pub mod image;
+pub mod audio;
 pub mod registry;
 
 pub use tool_trait::{Tool, ToolError, StepResult, RiskLevel};
