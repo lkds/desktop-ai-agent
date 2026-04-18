@@ -1,7 +1,7 @@
-/// Tauri 应用入口
-/// 集成 Rust Agent 后端
-
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
+
+//! Tauri 应用入口
+//! 集成 Rust Agent 后端
 
 use tauri::Manager;
 use std::sync::Arc;
