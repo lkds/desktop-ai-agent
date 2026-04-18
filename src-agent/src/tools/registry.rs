@@ -47,5 +47,9 @@ pub fn init_default_tools() -> ToolRegistry {
     registry.register(Arc::new(crate::tools::fileops::DirListTool));
     registry.register(Arc::new(crate::tools::fileops::FileMoveTool));
     registry.register(Arc::new(crate::tools::fileops::FileDeleteTool));
+    registry.register(Arc::new(crate::tools::browser::BrowserOpenTool));
+    registry.register(Arc::new(crate::tools::browser::BrowserSearchTool));
+    registry.register(Arc::new(crate::tools::shell::ShellExecuteTool));
+    registry.register(Arc::new(crate::tools::shell::ShellScriptTool));
     registry
 }

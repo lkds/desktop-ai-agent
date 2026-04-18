@@ -22,6 +22,7 @@ chrono = { version = "0.4", features = ["serde"] }
 thiserror = "1"
 anyhow = "1"
 dirs = "5"  # 获取用户目录
+urlencoding = "2"
 
 # Logging
 tracing = "0.1"
