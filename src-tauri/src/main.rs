@@ -155,6 +155,10 @@ fn main() {
                     Arc::new(OllamaProvider::new(config.provider.clone())
                         .expect("Failed to create Ollama provider"))
                 }
+                ProviderKind::DashScope => {
+                    Arc::new(DashScopeProvider::new(config.provider.clone())
+                        .expect("Failed to create DashScope provider"))
+                }
                 ProviderKind::Custom => {
                     Arc::new(OpenAIProvider::new(config.provider.clone())
                         .expect("Failed to create Custom provider"))
