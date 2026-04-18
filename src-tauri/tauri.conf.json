@@ -1,27 +1,28 @@
 {
-  "build": {
-    "beforeBuildCommand": "cd src-ui && npm run build",
-    "beforeDevCommand": "cd src-ui && npm run dev",
-    "devPath": "http://localhost:1420",
-    "distDir": "../src-ui/dist"
-  },
   "productName": "Desktop AI Agent",
   "version": "0.1.0",
   "identifier": "com.desktop-agent.app",
-  "plugins": {},
+  "build": {
+    "beforeBuildCommand": "cd src-ui && npm run build",
+    "beforeDevCommand": "cd src-ui && npm run dev",
+    "frontendDist": "../src-ui/dist",
+    "devUrl": "http://localhost:1420"
+  },
   "app": {
-    "security": {
-      "csp": null
-    },
+    "withGlobalTauri": false,
     "windows": [
       {
+        "label": "main",
         "title": "Desktop AI Agent",
         "width": 1200,
         "height": 800,
         "resizable": true,
         "fullscreen": false
       }
-    ]
+    ],
+    "security": {
+      "csp": null
+    }
   },
   "bundle": {
     "active": true,
