@@ -1,0 +1,1 @@
+std::iter::Map<std::slice::Iter<'_, agent::task::Step>, {closure@src/agent/executor.rs:229:18: 229:21}>

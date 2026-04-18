@@ -1,0 +1,1 @@
+std::iter::Map<std::slice::Iter<'_, providers::r#trait::Message>, {closure@src/providers/ollama.rs:47:22: 47:25}>

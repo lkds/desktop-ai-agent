@@ -1,0 +1,3 @@
+futures::stream::stream::filter_map::_::__Origin<'_, impl Stream<Item = Result<bytes::bytes::Bytes, reqwest::Error>>, {async block@src/providers/ollama.rs:123:33: 123:43}, {closure@src/providers/ollama.rs:123:25: 123:32}>
+futures::stream::FilterMap<impl Stream<Item = Result<bytes::bytes::Bytes, reqwest::Error>>, {async block@src/providers/ollama.rs:123:33: 123:43}, {closure@src/providers/ollama.rs:123:25: 123:32}>
+Box<futures::stream::FilterMap<impl Stream<Item = Result<bytes::bytes::Bytes, reqwest::Error>>, {async block@src/providers/ollama.rs:123:33: 123:43}, {closure@src/providers/ollama.rs:123:25: 123:32}>>

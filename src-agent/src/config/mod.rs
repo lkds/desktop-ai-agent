@@ -6,7 +6,7 @@ use std::path::PathBuf;
 use std::fs;
 use std::collections::HashMap;
 
-use crate::providers::ProviderConfig;
+use crate::providers::provider_trait::ProviderConfig;
 
 /// 应用配置
 #[derive(Debug, Clone, Serialize, Deserialize)]
