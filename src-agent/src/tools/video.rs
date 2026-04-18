@@ -195,13 +195,13 @@ impl VideoGeneratorTool {
             InputType::Text => {
                 // 文本转视频：本地只能创建简单字幕视频
                 Err(ToolError::ExecutionFailed(
-                    "Local text-to-video requires external API (Runway/Pika). Use image input for local generation."
+                    "Local text-to-video requires external API (Runway/Pika). Use image input for local generation.".to_string()
                 ))
             }
             InputType::Audio => {
                 // 音频+图片转视频
                 Err(ToolError::ExecutionFailed(
-                    "Local audio-to-video not implemented yet. Use Synthesia API for talking head videos."
+                    "Local audio-to-video not implemented yet. Use Synthesia API for talking head videos.".to_string()
                 ))
             }
         }
@@ -215,7 +215,7 @@ impl VideoGeneratorTool {
         // Synthesia API: https://api.synthesia.io/v2/videos
         
         Err(ToolError::ExecutionFailed(
-            "API video generation not yet implemented. Configure provider and API key in config."
+            "API video generation not yet implemented. Configure provider and API key in config.".to_string()
         ))
     }
 }
