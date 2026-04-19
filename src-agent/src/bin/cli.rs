@@ -2,7 +2,6 @@
 use qoderwork_agent::{
     AppConfig,
     AgentExecutor,
-    ProviderConfig,
     ProviderKind,
     ToolRegistry,
     SkillsManager,

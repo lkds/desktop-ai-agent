@@ -14,4 +14,5 @@ pub use agent::{Task, AgentExecutor, AgentError, SubagentConfig, SubagentResult,
 pub use providers::{Provider, ProviderConfig, ProviderKind, ProviderError, OpenAIProvider, DashScopeProvider};
 pub use tools::{Tool, ToolRegistry, ToolError, init_default_tools};
 pub use scheduler::{ScheduledTask, Schedule, Scheduler};
+pub use skills::{SkillsManager, Skill, SkillError};
 pub use config::AppConfig;
