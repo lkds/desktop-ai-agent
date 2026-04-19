@@ -2,6 +2,7 @@
 mod tests {
     use super::super::fileops::*;
     use super::super::registry::*;
+    use super::super::tool_trait::{Tool, ToolError};
     use tempfile::TempDir;
 
     #[tokio::test]
