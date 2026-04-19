@@ -1,51 +1,51 @@
+---
+name: excel-processor
+description: "处理 Excel 文件。触发条件：(1) 用户说'处理Excel'、'读取xlsx'、'编辑Excel' (2) 数据清洗、格式转换 (3) Excel 批量操作"
+---
+
 # Excel Processor
 
-Excel 文件处理：读取、写入、分析、图表生成。
+处理 Excel 文件的读取、写入、转换。
 
-## Description
-处理 Excel 文件，支持数据读取、写入、分析和可视化。
+## Workflow
 
-## Triggers
-- 处理 Excel
-- Excel 分析
-- 生成表格
-- 数据分析
+1. 读取 Excel/CSV 文件
+2. 执行数据操作（清洗、转换、合并）
+3. 输出结果
 
-## Prompt
-你是 Excel 处理助手。根据用户需求：
+## Scripts
 
-### 读取 Excel
-使用 shell_execute 调用 python pandas 读取数据。
+读取 Excel:
+```bash
+python scripts/read_excel.py <file.xlsx> [--sheet <name>]
+```
 
-### 写入 Excel
-生成 CSV 或使用 python-pandas 写入 Excel。
+写入 Excel:
+```bash
+python scripts/write_excel.py --data '<json>' --output <file.xlsx>
+```
 
-### 分析数据
-读取数据后进行统计分析，输出结果。
+CSV 转 Excel:
+```bash
+python scripts/csv_to_excel.py <input.csv> <output.xlsx>
+```
 
-### 生成图表
-使用 matplotlib 生成图表并保存。
-
-## Tools
-- file_read
-- file_write
-- shell_execute
+合并多个 Excel:
+```bash
+python scripts/merge_excel.py <file1.xlsx> <file2.xlsx> ... --output <merged.xlsx>
+```
 
 ## Parameters
-- action: read/write/analyze/chart
-- file_path: Excel 文件路径
-- data: 数据内容（写入时）
 
-## Examples
+| 参数 | 必填 | 说明 |
+|------|------|------|
+| input | ✓ | 输入文件路径 |
+| output | ✓ | 输出文件路径 |
+| sheet | | 工作表名称 |
+| format | | 输出格式 (xlsx/csv/json) |
 
-### Example 1: 分析 Excel
-Input: 分析 sales.xlsx 的销售数据
+## Dependencies
 
-Output:
-```
-分析结果：
-- 总销售额: 100,000
-- 平均订单: 500
-- 最高销量产品: 产品A
-- 数据趋势: 稳步上升
+```bash
+pip install openpyxl pandas
 ```

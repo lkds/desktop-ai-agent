@@ -1,43 +1,48 @@
-# Excel 数据分析 Skill
+---
+name: excel-analysis
+description: "分析 Excel 数据。触发条件：(1) 用户说'分析Excel'、'数据分析'、'统计Excel' (2) 数据透视、聚合统计 (3) 数据可视化"
+---
 
-## 描述
-使用 Python pandas 进行 Excel 数据分析，支持统计、筛选、图表生成。
+# Excel Analysis
 
-## 触发词
-- 分析 Excel
-- Excel 统计
-- 数据分析
-- 生成报表
+分析 Excel 数据，支持统计、聚合、可视化。
 
-## Prompt
-你是一个数据分析助手。用户会给你一个 Excel 文件和分析需求，你需要：
+## Workflow
 
-1. 使用 shell_execute 调用 Python pandas 读取 Excel
-2. 根据用户需求进行统计分析
-3. 生成分析结果或图表
-4. 输出到指定文件
+1. 读取 Excel 文件
+2. 执行分析（统计、聚合、透视）
+3. 输出结果（文本/图表）
 
-## 工具
-- shell_execute
-- file_write
-- browser_search (查找数据含义)
+## Scripts
 
-## 参数
-- file_path: Excel 文件路径
-- analysis_type: 统计/筛选/趋势/对比
-- output_format: text/chart/report
-
-## 示例
-
-输入: 分析 sales.xlsx，统计每个产品的销售额
-
-输出:
+基础统计:
+```bash
+python scripts/analyze.py <input.xlsx> [--sheet <name>]
 ```
-分析结果：
-产品A: ¥150,000 (30%)
-产品B: ¥120,000 (24%)
-产品C: ¥80,000 (16%)
-...
 
-总计: ¥500,000
+数据透视:
+```bash
+python scripts/pivot.py <input.xlsx> --index <column> --values <column> --agg sum
+```
+
+生成图表:
+```bash
+python scripts/plot.py <input.xlsx> --x <column> --y <column> --type bar --output chart.png
+```
+
+## Parameters
+
+| 参数 | 必填 | 说明 |
+|------|------|------|
+| input | ✓ | 输入文件路径 |
+| sheet | | 工作表名称 |
+| index | | 透视表行索引列 |
+| values | | 透视表值列 |
+| agg | | 聚合函数 (sum/mean/count/max/min) |
+| type | | 图表类型 (bar/line/pie/scatter) |
+
+## Dependencies
+
+```bash
+pip install pandas matplotlib openpyxl
 ```

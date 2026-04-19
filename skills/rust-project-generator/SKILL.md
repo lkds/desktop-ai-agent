@@ -1,42 +1,69 @@
+---
+name: rust-project-generator
+description: "生成 Rust 项目。触发条件：(1) 用户说'生成Rust项目'、'创建Rust程序'、'新建Rust' (2) CLI 工具 (3) Web 服务"
+---
+
 # Rust Project Generator
 
-## 描述
-从零创建完整的 Rust 项目，包括 Cargo.toml、源码、编译、测试。
+根据需求生成 Rust 项目脚手架。
 
-## 触发词
-- 创建 Rust 项目
-- 新建 Rust 工程
-- Rust CLI 工具
-- Cargo 项目
+## Workflow
 
-## Prompt
-你是 Rust 项目生成助手。根据用户需求：
-1. 设计项目结构
-2. 编写 Cargo.toml（正确的 dependencies）
-3. 编写源码（符合 Rust 最佳实践）
-4. 执行 cargo build
-5. 测试运行
+1. 确定项目类型（CLI / Web / Library）
+2. 使用 `cargo new` 创建项目
+3. 添加必要的依赖和模板代码
 
-## 工具
-- file_write
-- shell_execute
-- dir_list
+## Project Types
 
-## 参数
-- project_name: 项目名称
-- project_type: CLI/library/application
-- features: 功能列表
-
-## 示例
-
-输入: 创建一个 word-counter CLI 工具，统计文件行数/单词数/字符数
-
-输出:
+### CLI Tool
+```bash
+cargo new <project_name> --name <project_name>
 ```
-项目已创建:
-/tmp/word-counter/
-├── Cargo.toml
-├── src/main.rs
-编译成功: cargo build
-测试结果: Lines: 21, Words: 55, Chars: 544
+
+依赖:
+```toml
+[dependencies]
+clap = { version = "4", features = ["derive"] }
+anyhow = "1"
+tokio = { version = "1", features = ["full"] }
 ```
+
+### Web Service (Axum)
+```bash
+cargo new <project_name> --name <project_name>
+```
+
+依赖:
+```toml
+[dependencies]
+axum = "0.7"
+tokio = { version = "1", features = ["full"] }
+serde = { version = "1", features = ["derive"] }
+tower = "0.4"
+```
+
+### Library
+```bash
+cargo new <project_name> --lib --name <project_name>
+```
+
+## Best Practices
+
+生成的 Rust 项目应包含:
+
+1. **README.md**: 项目说明和使用方法
+2. **.gitignore**: `target/`, `Cargo.lock` (for libraries)
+3. **src/main.rs** / **src/lib.rs**: 入口文件
+4. **Proper error handling**: 使用 `anyhow` 或 `thiserror`
+
+## Example
+
+用户输入:
+```
+创建一个 Rust CLI 工具，用于计算文件的 SHA256 哈希值
+```
+
+生成:
+- `Cargo.toml` - 依赖配置
+- `src/main.rs` - 主程序
+- `README.md` - 使用说明
