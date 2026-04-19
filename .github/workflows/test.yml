@@ -1,0 +1,84 @@
+name: Test
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+
+jobs:
+  test-rust:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+      
+      - name: Rust cache
+        uses: swatinem/rust-cache@v2
+        with:
+          workspaces: './src-agent -> target'
+      
+      - name: Run tests
+        run: |
+          cd src-agent
+          cargo test --all
+      
+      - name: Check build
+        run: |
+          cd src-agent
+          cargo build --release --bin agent-cli
+
+  test-skills:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      
+      - name: Install dependencies
+        run: |
+          pip install openpyxl pandas pymupdf python-pptx pillow
+      
+      - name: Test Python scripts syntax
+        run: |
+          python -m py_compile skills/ppt-generator/scripts/generate_ppt.py
+          python -m py_compile skills/excel-processor/scripts/read_excel.py
+          python -m py_compile skills/excel-processor/scripts/write_excel.py
+          python -m py_compile skills/excel-processor/scripts/csv_to_excel.py
+          python -m py_compile skills/excel-processor/scripts/merge_excel.py
+          python -m py_compile skills/excel-analysis/scripts/analyze.py
+          python -m py_compile skills/excel-analysis/scripts/pivot.py
+          python -m py_compile skills/excel-analysis/scripts/plot.py
+          python -m py_compile skills/pdf-processor/scripts/extract_text.py
+          python -m py_compile skills/pdf-processor/scripts/merge_pdf.py
+          python -m py_compile skills/pdf-processor/scripts/split_pdf.py
+          python -m py_compile skills/pdf-processor/scripts/rotate_pdf.py
+          python -m py_compile skills/folder-organizer/scripts/organize_by_type.py
+          python -m py_compile skills/folder-organizer/scripts/organize_by_date.py
+          python -m py_compile skills/folder-organizer/scripts/batch_rename.py
+          python -m py_compile skills/folder-organizer/scripts/find_duplicates.py
+
+  test-frontend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      
+      - name: Install dependencies
+        run: |
+          cd src-ui
+          npm install
+      
+      - name: Build check
+        run: |
+          cd src-ui
+          npm run build
