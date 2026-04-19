@@ -24,7 +24,7 @@ impl Tool for ShellExecuteTool {
     async fn execute(&self, params: serde_json::Value, _allowed: &[String]) -> Result<StepResult, ToolError> {
         let command = params["command"].as_str()
             .ok_or_else(|| ToolError::InvalidParameters("command required".into()))?;
-        let timeout = params["timeout"].as_i64().unwrap_or(30);
+        let _timeout = params["timeout"].as_i64().unwrap_or(30);
         
         // 安全检查：禁止危险命令
         let dangerous = ["rm -rf", "sudo", "chmod 777", "mkfs", "dd", "format"];

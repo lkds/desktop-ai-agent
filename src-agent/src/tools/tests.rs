@@ -1,8 +1,7 @@
 #[cfg(test)]
 mod tests {
-    use super::*;
-    use super::fileops::*;
-    use super::registry::*;
+    use super::super::fileops::*;
+    use super::super::registry::*;
     use tempfile::TempDir;
 
     #[tokio::test]

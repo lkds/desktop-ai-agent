@@ -114,6 +114,7 @@ struct OllamaRequest {
 }
 
 #[derive(Deserialize)]
+#[allow(dead_code)]
 struct OllamaResponse {
     response: String,
     done: bool,

@@ -4,7 +4,7 @@ use std::sync::Arc;
 use tokio::sync::Mutex;
 use serde::{Deserialize, Serialize};
 
-use crate::agent::{AgentExecutor, Task};
+use crate::agent::AgentExecutor;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct SubagentConfig {

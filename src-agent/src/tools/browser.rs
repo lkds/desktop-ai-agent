@@ -2,7 +2,7 @@
 /// 使用 headless browser 进行网页操作
 
 use async_trait::async_trait;
-use serde::{Deserialize, Serialize};
+
 use std::collections::HashMap;
 
 use super::tool_trait::{Tool, ToolError, StepResult, RiskLevel};
