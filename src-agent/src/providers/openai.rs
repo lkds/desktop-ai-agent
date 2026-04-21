@@ -3,6 +3,8 @@ use async_trait::async_trait;
 use reqwest::Client;
 use serde::{Deserialize, Serialize};
 use std::time::Duration;
+use std::pin::Pin;
+use futures::Stream;
 use super::provider_trait::*;
 
 pub struct OpenAIProvider {
@@ -93,7 +95,7 @@ impl Provider for OpenAIProvider {
     }
     
     async fn generate_stream(&self, _request: GenerateRequest) 
-        -> Result<Box<dyn futures::Stream<Item = StreamChunk> + Unpin + Send>, ProviderError> {
+        -> Result<Pin<Box<dyn Stream<Item = StreamChunk> + Send>>, ProviderError> {
         Err(ProviderError::InternalError("Streaming not implemented".to_string()))
     }
     

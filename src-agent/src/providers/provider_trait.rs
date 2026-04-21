@@ -4,6 +4,8 @@
 use async_trait::async_trait;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
+use std::pin::Pin;
+use futures::Stream;
 
 /// Provider 配置
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -131,7 +133,7 @@ pub trait Provider: Send + Sync {
     async fn generate_stream(
         &self,
         request: GenerateRequest,
-    ) -> Result<Box<dyn futures::Stream<Item = StreamChunk> + Unpin + Send>, ProviderError>;
+    ) -> Result<Pin<Box<dyn Stream<Item = StreamChunk> + Send>>, ProviderError>;
     
     /// 检查 Provider 是否可用
     async fn health_check(&self) -> Result<bool, ProviderError>;
